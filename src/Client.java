@@ -5,7 +5,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 public class Client {
-    public Runnable getRunnable() { // Runnable ek aisa function hai jo kuch accept nahi karta, bas ek hi method hai 'run'
+    public Runnable getRunnable() {
         return new Runnable() {
             @Override
             public void run() {
@@ -14,6 +14,7 @@ public class Client {
                     InetAddress address = InetAddress.getByName("localhost");
                     Socket socket = new Socket(address, port);
                     try {
+                        // Initialize output stream to send data to the server
                         PrintWriter toSocket = new PrintWriter(socket.getOutputStream(), true);
                         BufferedReader fromSocket = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
@@ -25,6 +26,7 @@ public class Client {
                         System.out.println("Server says: " + response);
 
                     } finally {
+                        // Close the socket after communication
                         socket.close();
                     }
                 } catch (Exception e) {

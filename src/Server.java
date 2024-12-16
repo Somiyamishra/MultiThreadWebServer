@@ -5,37 +5,39 @@ import java.net.Socket;
 import java.util.function.Consumer;
 
 public class Server {
-    public Consumer<Socket> getConsumer(){
-        return (clientSocket)->{
+    public Consumer<Socket> getConsumer() {
+        return (clientSocket) -> {
             try {
-                PrintWriter toClient=new PrintWriter(clientSocket.getOutputStream());
-                toClient.println("hello from the Server");
+                // Send a message to the client
+                PrintWriter toClient = new PrintWriter(clientSocket.getOutputStream(), true);
+                toClient.println("Hello from the Server!");
+                System.out.println("Message sent to client");
+
+                // Close the resources
                 toClient.close();
                 clientSocket.close();
-            }catch (IOException ex){//if upper koi bhi erroe ata h to wo yaha print kardenge
-ex.printStackTrace();
-
+            } catch (IOException ex) {
+                // Print any errors that occur
+                ex.printStackTrace();
             }
         };
     }
-    public  static void main(String[] args) {
-        int port = 8010;
-        Server server= new Server();
-        try {
-            ServerSocket serverSocket=new ServerSocket(port);
-            serverSocket.setSoTimeout(10000);
-            System.out.println("Server is lsitneing on port"+port);
-            while (true){
-                Socket acceptedSocket=serverSocket.accept();//makes new socket
-                Thread thread=new Thread(()->server.getConsumer().accept(acceptedSocket));
-                //runs function in which the socket will communicate
-thread.start();
-        }
 
-    }
-        catch (IOException ex){
+    public static void main(String[] args) {
+        int port = 8010;
+        Server server = new Server();
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
+            serverSocket.setSoTimeout(10000); // Set a timeout of 10 seconds
+            System.out.println("Server is listening on port " + port);
+
+            while (true) {
+                Socket acceptedSocket = serverSocket.accept(); // Accept a new client connection
+                Thread thread = new Thread(() -> server.getConsumer().accept(acceptedSocket));
+                thread.start(); // Handle each client in a new thread
+            }
+
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
-
     }
 }
